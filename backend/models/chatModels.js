@@ -17,12 +17,14 @@ const chatSchema = new mongoose.Schema({
         type: String,
         required: true,
       },
-    },
-  ],
-  citations: [
-    {
-      filename: String,
-      score: Number,
+      citations: [
+        {
+          originalname: String,
+          filename: String,
+          score: Number,
+          pageNumbers: [Number],
+        },
+      ],
     },
   ],
   createdAt: {

@@ -14,9 +14,12 @@ export const chatController = async (req, res) => {
       userId: req.user.id,
       messages: [
         { role: "user", content: query },
-        { role: "assistant", content: result.answer },
+        {
+          role: "assistant",
+          content: result.answer,
+          citations: result.citations,
+        },
       ],
-      citations: result.citations,
     });
     await chat.save();
 

@@ -1,7 +1,10 @@
 export function buildSystemPrompt(userQuery, retrievedChunks) {
   const context = retrievedChunks
     .map(
-      (chunk, i) => `Source ${i + 1} (${chunk.filename}):\n${chunk.chunkText}`,
+      (chunk, i) => {
+        const pagesStr = chunk.chunkPage ? `Page: ${chunk.chunkPage}` : '';
+        return `Source ${i + 1} (${chunk.filename} ${pagesStr}):\n${chunk.chunkText}`;
+      }
     )
     .join("\n\n");
 

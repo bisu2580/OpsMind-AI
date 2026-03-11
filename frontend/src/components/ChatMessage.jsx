@@ -1,6 +1,6 @@
 export default function ChatMessage({ message }) {
   const isUser = message.role === "user";
-
+  console.log(message);
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
       <div className={`max-w-2xl space-y-2`}>
@@ -19,7 +19,7 @@ export default function ChatMessage({ message }) {
             <p className="text-indigo-400 font-semibold">Sources</p>
             {message.citations.map((c, i) => (
               <div key={i}>
-                {c.file} — Page {c.page}
+                {c.originalname} — Page {c.pageNumbers?.length > 0 ? c.pageNumbers.join(", ") : 'N/A'}
               </div>
             ))}
           </div>

@@ -22,11 +22,23 @@ export const uploadToServerController = async (req, res) => {
     for (const file of req.files) {
       const parser = new PDFParse({ url: file.path });
       const result = await parser.getText();
-      const textChunks = chunkText(result.text);
+
+      const textChunks = [];
+      const chunkPages = [];
+      for (const page of result.pages) {
+        if (!page.text) continue;
+        const pageChunks = chunkText(page.text);
+        textChunks.push(...pageChunks);
+        for (let i = 0; i < pageChunks.length; i++) {
+          chunkPages.push(page.num);
+        }
+      }
+
       const embeddings = await generateEmbeddingsBatch(textChunks);
       const vectorChunks = textChunks.map((chunk, index) => ({
         text: chunk,
         embeddings: embeddings[index],
+        page: chunkPages[index],
       }));
       const doc = await File.create({
         filename: file.filename,

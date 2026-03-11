@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const chunkSchema = new mongoose.Schema({
   text: { type: String, required: true },
   embeddings: { type: [Number], required: true },
+  page: { type: Number },
 });
 const fileSchema = new mongoose.Schema(
   {
