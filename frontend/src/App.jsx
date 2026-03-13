@@ -18,7 +18,6 @@ import Documents from "./admin/pages/Documents";
 import Analytics from "./admin/pages/Analytics";
 import AuditLogs from "./admin/pages/AuditLogs";
 import Settings from "./admin/pages/Settinngs";
-
 function App() {
   return (
     <div className="h-screen w-screen relative overflow-x-hidden">

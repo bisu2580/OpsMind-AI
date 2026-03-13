@@ -15,14 +15,30 @@ export async function ragChat(userQuery) {
   const retrievedChunks = await retrieveTopChunks(queryEmbedding, 3);
   const systemPrompt = buildSystemPrompt(userQuery, retrievedChunks);
   const response = await llm.invoke(systemPrompt);
+  const citationMap = new Map();
+  for (const c of retrievedChunks) {
+    if (!citationMap.has(c.filename)) {
+      citationMap.set(c.filename, {
+        originalname: c.originalname,
+        filename: c.filename,
+        score: c.score,
+        pages: new Set(),
+      });
+    }
+    if (c.chunkPage) {
+      citationMap.get(c.filename).pages.add(c.chunkPage);
+    }
+  }
+
+  const citations = Array.from(citationMap.values()).map((c) => ({
+    originalname: c.originalname,
+    filename: c.filename,
+    score: c.score,
+    pageNumbers: Array.from(c.pages).sort((a, b) => a - b),
+  }));
 
   return {
     answer: response.content,
-    citations: retrievedChunks.map((c) => ({
-      originalname: c.originalname,
-      filename: c.filename,
-      score: c.score,
-      pageNumber: c.pageNumber,
-    })),
+    citations: citations,
   };
 }
