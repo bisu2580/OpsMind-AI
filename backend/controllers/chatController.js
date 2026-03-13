@@ -20,6 +20,7 @@ export const chatController = async (req, res) => {
           citations: result.citations,
         },
       ],
+      createdAt: new Date(),
     });
     await chat.save();
 
@@ -39,7 +40,7 @@ export const chatController = async (req, res) => {
 export const chatHistoryController = async (req, res) => {
   try {
     const chatHistory = await Chat.find({ userId: req.user.id }).sort({
-      createdAt: -1,
+      createdAt: 1,
     });
     res.status(200).json({
       success: true,
@@ -51,5 +52,31 @@ export const chatHistoryController = async (req, res) => {
       success: false,
       message: err.message,
     });
+  }
+};
+export const getAuditLogsController = async (req, res) => {
+  try {
+    const chats = await Chat.find()
+      .populate("userId", "name email")
+      .sort({ createdAt: -1 });
+
+    const auditLogs = chats.flatMap((chat) =>
+      chat.messages
+        .filter((msg) => msg.role === "user")
+        .map((msg, idx) => {
+          // Find the assistant reply immediately after this user message
+          const assistantReply = chat.messages[chat.messages.indexOf(msg) + 1];
+          return {
+            query: msg.content,
+            user: chat.userId?.username || chat.userId?.email || "Unknown",
+            citations: assistantReply?.citations || [],
+            // createdAt: msg.createdAt || chat.createdAt,
+          };
+        }),
+    );
+
+    return res.status(200).json({ success: true, auditLogs });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
   }
 };
