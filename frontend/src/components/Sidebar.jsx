@@ -62,6 +62,10 @@ const Sidebar = () => {
       }
     };
     fetchChatHistory();
+    window.addEventListener("chat-updated", fetchChatHistory);
+    return () => {
+      window.removeEventListener("chat-updated", fetchChatHistory);
+    };
   }, []);
 
   const viewDocs = (doc) => {

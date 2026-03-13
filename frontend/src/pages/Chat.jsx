@@ -90,6 +90,7 @@ export default function Chat() {
       };
 
       setChats((prev) => [...prev, assistantMsg]);
+      window.dispatchEvent(new Event("chat-updated"));
     } catch (err) {
       console.error(err);
     } finally {

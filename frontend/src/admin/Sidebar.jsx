@@ -25,11 +25,11 @@ const links = [
     path: "/admin/audit",
     icon: ShieldCheck,
   },
-  {
-    name: "Settings",
-    path: "/admin/settings",
-    icon: Settings,
-  },
+  // {
+  //   name: "Settings",
+  //   path: "/admin/settings",
+  //   icon: Settings,
+  // },
 ];
 
 export default function Sidebar() {

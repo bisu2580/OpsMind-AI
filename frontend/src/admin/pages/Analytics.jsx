@@ -1,44 +1,87 @@
 import { useEffect, useState } from "react";
 import useDocuments from "../hooks/useDocument";
-
-const initialAnalyticsCards = [
-  {
-    label: "Total Documents",
-    value: 0,
-  },
-  {
-    label: "Total Queries",
-    value: 1240,
-  },
-  {
-    label: "Avg Response Time",
-    value: "1.2s",
-  },
-];
+import { Loader2 } from "lucide-react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
 
 export default function Analytics() {
-  const { docs, loading } = useDocuments();
-  const [analyticsCards, setAnalyticsCards] = useState(initialAnalyticsCards);
+  const { docs, loading: docsLoading } = useDocuments();
+  const [topTopics, setTopTopics] = useState([]);
+  const [totalQueries, setTotalQueries] = useState(0);
+  const [historyLoading, setHistoryLoading] = useState(true);
 
   useEffect(() => {
-    if (loading) return;
+    const fetchHistory = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        const res = await fetch("http://localhost:5000/api/chat/history/all", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await res.json();
+        console.log(data);
+        const allMessages =
+          data.chatHistory?.flatMap((chat) => chat.messages) || [];
+        const userMessages = allMessages.filter((m) => m.role === "user");
 
-    const updateCards = () => {
-      setAnalyticsCards([
-        { ...initialAnalyticsCards[0], value: docs?.length ?? 0 },
-        { ...initialAnalyticsCards[1] },
-        { ...initialAnalyticsCards[2] },
-      ]);
+        setTotalQueries(userMessages.length);
+
+        // Group by first 4 words as topic key
+        const topicMap = {};
+        userMessages.forEach((m) => {
+          const topic = m.content.split(" ").slice(0, 4).join(" ");
+          topicMap[topic] = (topicMap[topic] || 0) + 1;
+        });
+
+        const sorted = Object.entries(topicMap)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 6)
+          .map(([topic, count]) => ({ topic, count }));
+
+        setTopTopics(sorted);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setHistoryLoading(false);
+      }
     };
 
-    updateCards();
-  }, [loading, docs]);
+    fetchHistory();
+  }, []);
 
-  if (loading) {
+  const isLoading = docsLoading || historyLoading;
+
+  const statCards = [
+    { label: "Total Documents", value: docs?.length ?? 0 },
+    { label: "Total Queries", value: totalQueries },
+    { label: "Avg Response Time", value: "1.2s" },
+  ];
+
+  const tooltipStyle = {
+    contentStyle: {
+      background: "#18181b",
+      border: "1px solid #ffffff20",
+      borderRadius: 8,
+    },
+    labelStyle: { color: "#a5b4fc" },
+    itemStyle: { color: "#fff" },
+  };
+
+  if (isLoading) {
     return (
       <div>
         <h1 className="text-2xl font-bold mb-6">Knowledge Insights</h1>
-        <p className="text-sm text-white/60">Loading analytics...</p>
+        <div className="flex items-center gap-2 text-white/60 text-sm">
+          <Loader2 className="w-4 h-4 animate-spin" /> Loading analytics...
+        </div>
       </div>
     );
   }
@@ -47,8 +90,9 @@ export default function Analytics() {
     <div>
       <h1 className="text-2xl font-bold mb-6">Knowledge Insights</h1>
 
+      {/* Stat Cards */}
       <div className="grid md:grid-cols-3 gap-6">
-        {analyticsCards?.map((stat, i) => (
+        {statCards.map((stat, i) => (
           <div
             key={i}
             className="rounded-2xl bg-white/10 border border-white/20 backdrop-blur-xl p-6"
@@ -59,49 +103,40 @@ export default function Analytics() {
         ))}
       </div>
 
+      {/* Chart */}
       <div className="mt-8 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-xl p-6">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h3 className="text-lg font-semibold">
-              Knowledge Graph & Insights
-            </h3>
+            <h3 className="text-lg font-semibold">Top Queried Topics</h3>
             <p className="text-sm text-white/60 mt-1">
-              Visual representation of document-topic relationships and usage
-              patterns.
+              Most frequently asked questions by users.
             </p>
           </div>
-
           <span className="px-3 py-1 text-xs rounded-md bg-indigo-500/20 text-indigo-400">
-            Real-Time Analytics
+            Live Data
           </span>
         </div>
 
-        {/* Graph Grid */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Knowledge Graph */}
-          <div className="h-[250px] rounded-xl bg-black/30 border border-white/10 flex items-center justify-center">
-            <p className="text-white/50 text-sm">
-              🔗 Force-Directed Knowledge Graph (Topics ↔ Documents)
-            </p>
+        {topTopics.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={topTopics} layout="vertical">
+              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
+              <XAxis type="number" tick={{ fill: "#ffffff60", fontSize: 11 }} />
+              <YAxis
+                dataKey="topic"
+                type="category"
+                tick={{ fill: "#ffffff60", fontSize: 10 }}
+                width={160}
+              />
+              <Tooltip {...tooltipStyle} />
+              <Bar dataKey="count" fill="#6366f1" radius={[0, 4, 4, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="h-[300px] flex items-center justify-center text-white/30 text-sm">
+            No queries found yet.
           </div>
-
-          {/* Top Topics */}
-          <div className="h-[250px] rounded-xl bg-black/30 border border-white/10 flex items-center justify-center">
-            <p className="text-white/50 text-sm">
-              📊 Top Queried Topics (Bar Chart)
-            </p>
-          </div>
-
-          {/* Document Usage */}
-          <div className="h-[250px] rounded-xl bg-black/30 border border-white/10 flex items-center justify-center">
-            <p className="text-white/50 text-sm">📄 Document Usage Frequency</p>
-          </div>
-
-          {/* Query Trends */}
-          <div className="h-[250px] rounded-xl bg-black/30 border border-white/10 flex items-center justify-center">
-            <p className="text-white/50 text-sm">📈 Query Volume Over Time</p>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

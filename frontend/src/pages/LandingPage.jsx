@@ -13,13 +13,17 @@ import {
 } from "lucide-react";
 import "../index.css";
 import useAuth from "../hooks/useAuth";
-
+const CTA_CONFIG = {
+  guest: { label: "Get Started Now", path: "/login?role=user" },
+  user: { label: "Ask Questions", path: "/chat" },
+  admin: { label: "Go to Admin Dashboard", path: "/admin" },
+};
 export default function LandingPage() {
   const navigate = useNavigate();
   const [hovered, setHovered] = useState(null);
   const { user } = useAuth();
   const [loginPopup, setLoginPopup] = useState(false);
-
+  const { label, path } = CTA_CONFIG[user?.role ?? "guest"];
   return (
     <div className="min-h-screen bg-[#05070f] text-white font-sans overflow-hidden">
       {/* Animated Background Effects */}
@@ -37,26 +41,7 @@ export default function LandingPage() {
             AI
           </span>
         </h1>
-        <div className="hidden md:flex gap-8 text-sm">
-          <a
-            href="#features"
-            className="text-white/70 hover:text-white transition duration-300"
-          >
-            Features
-          </a>
-          <a
-            href="#security"
-            className="text-white/70 hover:text-white transition duration-300"
-          >
-            Security
-          </a>
-          <a
-            href="#pricing"
-            className="text-white/70 hover:text-white transition duration-300"
-          >
-            Pricing
-          </a>
-        </div>
+
         <button className="px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 font-semibold hover:shadow-lg hover:shadow-indigo-500/50 transition duration-300 flex items-center gap-2">
           {user?.role === "user" ? (
             <div
@@ -133,7 +118,7 @@ export default function LandingPage() {
             <div className="px-3 py-2 text-xs text-white/50 text-center">
               Don't have an account?{" "}
               <button
-                onClick={() => navigate("/register")}
+                onClick={() => navigate("/register?role=user")}
                 className="text-indigo-300 hover:text-indigo-200 transition"
               >
                 Sign up
@@ -174,11 +159,16 @@ export default function LandingPage() {
 
             <div className="flex flex-col sm:flex-row gap-4 mb-10">
               <button className="px-8 py-4 rounded-xl bg-linear-to-r from-indigo-500 to-purple-600 font-semibold shadow-lg shadow-indigo-500/50 hover:shadow-indigo-500/75 hover:-translate-y-1 transition duration-300 flex items-center justify-center gap-2 font-display">
-                Request Access <ArrowRight size={18} />
+                <div
+                  onClick={() => navigate(path)}
+                  className="rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 font-semibold hover:shadow-lg hover:shadow-indigo-500 flex gap-2 items-center"
+                >
+                  {label} <ArrowRight size={16} />
+                </div>
               </button>
-              <button className="font-display px-8 py-4 rounded-xl bg-white/10 border border-white/30 font-semibold hover:bg-white/20 hover:border-white/50 transition duration-300 backdrop-blur-xl">
+              {/* <button className="font-display px-8 py-4 rounded-xl bg-white/10 border border-white/30 font-semibold hover:bg-white/20 hover:border-white/50 transition duration-300 backdrop-blur-xl">
                 View Demo
-              </button>
+              </button> */}
             </div>
 
             {/* Stats */}

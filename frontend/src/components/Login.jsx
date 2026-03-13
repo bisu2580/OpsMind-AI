@@ -43,7 +43,7 @@ const Login = () => {
         localStorage.setItem("accessToken", data.data.accessToken);
         localStorage.setItem("role", data.data.user.role);
         if (data.data.user.role === "admin") {
-          navigate("/upload");
+          navigate("/admin");
         } else {
           navigate("/chat");
         }

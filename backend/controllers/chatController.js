@@ -80,3 +80,60 @@ export const getAuditLogsController = async (req, res) => {
     return res.status(500).json({ success: false, message: err.message });
   }
 };
+export const getAnalyticsController = async (req, res) => {
+  try {
+    const chats = await Chat.find().sort({ createdAt: 1 });
+
+    const queryVolumeMap = {};
+    let totalQueries = 0;
+
+    chats.forEach((chat) => {
+      chat.messages
+        .filter((m) => m.role === "user")
+        .forEach((m) => {
+          totalQueries++;
+          const date = new Date(m.createdAt || chat.createdAt)
+            .toISOString()
+            .split("T")[0];
+          queryVolumeMap[date] = (queryVolumeMap[date] || 0) + 1;
+        });
+    });
+
+    const queryVolume = Object.entries(queryVolumeMap).map(([date, count]) => ({
+      date,
+      count,
+    }));
+
+    const topicMap = {};
+    chats.forEach((chat) => {
+      chat.messages
+        .filter((m) => m.role === "user")
+        .forEach((m) => {
+          const topic = m.content.split(" ").slice(0, 4).join(" ");
+          topicMap[topic] = (topicMap[topic] || 0) + 1;
+        });
+    });
+
+    const topTopics = Object.entries(topicMap)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([topic, count]) => ({ topic, count }));
+
+    return res.status(200).json({
+      success: true,
+      totalQueries,
+      queryVolume,
+      topTopics,
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+export const getAllChatHistoryController = async (req, res) => {
+  try {
+    const chats = await Chat.find().sort({ createdAt: 1 });
+    return res.status(200).json({ success: true, chatHistory: chats });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
