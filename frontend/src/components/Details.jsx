@@ -4,7 +4,7 @@ import useDocuments, { formatDate } from "../admin/hooks/useDocument";
 
 const Details = () => {
   const { user, loading: authLoading } = useAuth();
-
+  const url = import.meta.env.VITE_BACKEND_URL;
   // only fetch docs if we're an admin
   const { docs, loading: docsLoading } = useDocuments(user?.role === "admin");
 
@@ -47,10 +47,7 @@ const Details = () => {
                   </div>
                   <button
                     onClick={() =>
-                      window.open(
-                        `http://localhost:5000/uploads/${doc.filename}`,
-                        "_blank",
-                      )
+                      window.open(`${url}/uploads/${doc.filename}`, "_blank")
                     }
                     className="text-indigo-300 hover:underline text-sm"
                   >

@@ -5,12 +5,13 @@ export default function AuditLogs() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const url = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchLogs = async () => {
       try {
         const token = localStorage.getItem("accessToken");
-        const res = await fetch("http://localhost:5000/api/chat/audit", {
+        const res = await fetch(`${url}/api/chat/audit`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();

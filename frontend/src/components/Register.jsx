@@ -22,6 +22,7 @@ const Register = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const role = useSearchParams()[0].get("role");
+  const url = import.meta.env.VITE_BACKEND_URL;
 
   const validatePassword = (pwd) => {
     return pwd.length >= 8;
@@ -49,21 +50,18 @@ const Register = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/auth/register-user",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username: userName,
-            email: email,
-            password: password,
-            role: role,
-          }),
+      const response = await fetch(`${url}/api/auth/register-user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          username: userName,
+          email: email,
+          password: password,
+          role: role,
+        }),
+      });
 
       if (!response.ok) {
         throw new Error("Registration failed");
@@ -108,7 +106,9 @@ const Register = () => {
         {/* Form Container */}
         <div className="rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20 backdrop-blur-xl p-8 shadow-2xl">
           <h2 className="text-2xl font-bold text-center mb-4 font-display">
-            Create {role ? `${role.charAt(0).toUpperCase() + role.slice(1)}` : "New"} Account
+            Create{" "}
+            {role ? `${role.charAt(0).toUpperCase() + role.slice(1)}` : "New"}{" "}
+            Account
           </h2>
 
           {/* Error Message */}

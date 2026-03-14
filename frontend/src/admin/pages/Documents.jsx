@@ -8,6 +8,7 @@ export default function Documents() {
   const [alldocs, setDocs] = useState([]);
   // const [loading, setLoading] = useState(false);
   const { docs, loading } = useDocuments();
+  const url = import.meta.env.VITE_BACKEND_URL;
 
   const handleSelect = (e) => setFiles([...e.target.files]);
   const formatDate = (timestamp) => {
@@ -44,16 +45,13 @@ export default function Documents() {
     console.log(formData.getAll("files"));
     const accessToken = localStorage.getItem("accessToken");
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/upload/upload-to-server",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: formData,
+      const response = await fetch(`${url}/api/upload/upload-to-server`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
-      );
+        body: formData,
+      });
       if (!response.ok) {
         throw new Error("Upload failed");
       }
@@ -70,18 +68,16 @@ export default function Documents() {
   const handleDelete = async (docId) => {
     try {
       const accessToken = localStorage.getItem("accessToken");
-      const response = await fetch(
-        `http://localhost:5000/api/text/delete-document/${docId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
+      const response = await fetch(`${url}/api/text/delete-document/${docId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
-      );
+      });
       if (!response.ok) throw new Error("Failed to delete document");
-      const data= await response.json();
-      if(!data.success) throw new Error(data.message || "Failed to delete document");
+      const data = await response.json();
+      if (!data.success)
+        throw new Error(data.message || "Failed to delete document");
       setDocs((prev) => prev.filter((doc) => doc._id !== docId));
     } catch (err) {
       console.error(err);

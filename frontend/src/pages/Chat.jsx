@@ -15,6 +15,7 @@ export default function Chat() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const bottomRef = useRef(null);
+  const url = import.meta.env.VITE_BACKEND_URL;
 
   // Auto scroll
   useEffect(() => {
@@ -27,7 +28,7 @@ export default function Chat() {
     const fetchChatHistory = async () => {
       try {
         const token = localStorage.getItem("accessToken");
-        const res = await fetch("http://localhost:5000/api/chat/history", {
+        const res = await fetch(`${url}/api/chat/history`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -71,7 +72,7 @@ export default function Chat() {
     try {
       const token = localStorage.getItem("accessToken");
 
-      const res = await fetch("http://localhost:5000/api/chat", {
+      const res = await fetch(`${url}/api/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

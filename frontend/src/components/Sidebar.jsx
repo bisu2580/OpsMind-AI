@@ -33,7 +33,7 @@ const Sidebar = () => {
   const { docs, loading } = useDocuments();
   const [chats, setChats] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(true);
-
+  const url = import.meta.env.VITE_BACKEND_URL;
   useEffect(() => {
     setHistoryLoading(true);
     const fetchChatHistory = async () => {
@@ -69,7 +69,7 @@ const Sidebar = () => {
   }, []);
 
   const viewDocs = (doc) => {
-    window.open(`http://localhost:5000/uploads/${doc.filename}`, "_blank");
+    window.open(`${url}/uploads/${doc.filename}`, "_blank");
   };
 
   return (

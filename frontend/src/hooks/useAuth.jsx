@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 export default function useAuth() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const url = import.meta.env.VITE_BACKEND_URL;
   useEffect(() => {
     const fetchUser = async () => {
       const accessToken = localStorage.getItem("accessToken");
@@ -13,14 +13,11 @@ export default function useAuth() {
         return;
       }
       try {
-        const response = await fetch(
-          "http://localhost:5000/api/auth/get-user",
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
+        const response = await fetch(`${url}/api/auth/get-user`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
           },
-        );
+        });
         if (response.status === 401) {
           localStorage.removeItem("accessToken");
           localStorage.removeItem("refreshToken");

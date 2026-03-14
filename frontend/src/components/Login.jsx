@@ -12,26 +12,24 @@ const Login = () => {
   const navigate = useNavigate();
   const params = useSearchParams();
   const role = params[0].get("role");
+  const url = import.meta.env.VITE_BACKEND_URL;
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/auth/login-user",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username: userName,
-            email: email,
-            password: password,
-          }),
+      const response = await fetch(`${url}/api/auth/login-user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          username: userName,
+          email: email,
+          password: password,
+        }),
+      });
 
       if (!response.ok) {
         throw new Error(response.statusText);

@@ -4,21 +4,20 @@ import { useNavigate } from "react-router-dom";
 
 export default function Topbar() {
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
+  const url = import.meta.env.VITE_BACKEND_URL;
   const handleLogout = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/auth/logout-user",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            refreshToken: localStorage.getItem("refreshToken"),
-          }),
+      const response = await fetch(`${url}/api/auth/logout-user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          refreshToken: localStorage.getItem("refreshToken"),
+        }),
+      });
       if (!response.ok) {
         throw new Error("Logout failed");
       }

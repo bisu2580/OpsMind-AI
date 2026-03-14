@@ -6,6 +6,7 @@ const Uploader = () => {
   const navigate = useNavigate();
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
+  const url = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     setLoading(true);
@@ -39,16 +40,13 @@ const Uploader = () => {
     console.log(formData.getAll("files"));
     const accessToken = localStorage.getItem("accessToken");
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/upload/upload-to-server",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: formData,
+      const response = await fetch(`${url}/api/upload/upload-to-server`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
-      );
+        body: formData,
+      });
       if (!response.ok) {
         throw new Error("Upload failed");
       }
@@ -64,18 +62,15 @@ const Uploader = () => {
   const handleLogout = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/auth/logout-user",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            refreshToken: localStorage.getItem("refreshToken"),
-          }),
+      const response = await fetch(`${url}/api/auth/logout-user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          refreshToken: localStorage.getItem("refreshToken"),
+        }),
+      });
       if (!response.ok) {
         throw new Error("Logout failed");
       }

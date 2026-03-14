@@ -64,13 +64,11 @@ export const getAuditLogsController = async (req, res) => {
       chat.messages
         .filter((msg) => msg.role === "user")
         .map((msg, idx) => {
-          // Find the assistant reply immediately after this user message
           const assistantReply = chat.messages[chat.messages.indexOf(msg) + 1];
           return {
             query: msg.content,
             user: chat.userId?.username || chat.userId?.email || "Unknown",
             citations: assistantReply?.citations || [],
-            // createdAt: msg.createdAt || chat.createdAt,
           };
         }),
     );

@@ -16,12 +16,13 @@ export default function Analytics() {
   const [topTopics, setTopTopics] = useState([]);
   const [totalQueries, setTotalQueries] = useState(0);
   const [historyLoading, setHistoryLoading] = useState(true);
+  const url = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchHistory = async () => {
       try {
         const token = localStorage.getItem("accessToken");
-        const res = await fetch("http://localhost:5000/api/chat/history/all", {
+        const res = await fetch(`${url}/api/chat/history/all`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

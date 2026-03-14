@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 export default function useDocuments(enabled = true) {
   const [docs, setDocs] = useState([]);
   const [loading, setLoading] = useState(false);
+  const url = import.meta.env.VITE_BACKEND_URL;
   useEffect(() => {
     if (!enabled) {
       setDocs([]);
@@ -13,9 +14,7 @@ export default function useDocuments(enabled = true) {
     const fetchDocs = async () => {
       try {
         setLoading(true);
-        const response = await fetch(
-          "http://localhost:5000/api/text/get-documents",
-        );
+        const response = await fetch(`${url}/api/text/get-documents`);
         if (!response.ok) throw new Error("Failed to fetch documents");
         const data = await response.json();
         setDocs(data.files || []);
