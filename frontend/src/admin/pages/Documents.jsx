@@ -58,7 +58,7 @@ export default function Documents() {
       const data = await response.json();
       if (data.success) {
         setDocs((prev) => [...data.files, ...prev]);
-      }
+      } else throw new Error(data.message);
     } catch (err) {
       console.error(err);
     }
