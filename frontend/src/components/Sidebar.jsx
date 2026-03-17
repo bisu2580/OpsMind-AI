@@ -39,7 +39,7 @@ const Sidebar = () => {
     const fetchChatHistory = async () => {
       try {
         const token = localStorage.getItem("accessToken");
-        const res = await fetch("http://localhost:5000/api/chat/history", {
+        const res = await fetch(`${url}/api/chat/history`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -69,7 +69,9 @@ const Sidebar = () => {
   }, []);
 
   const viewDocs = (doc) => {
-    window.open(`${url}/uploads/${doc.filename}`, "_blank");
+    if (import.meta.env.DEV) {
+      window.open(`http://localhost:5000/uploads/${doc.filename}`, "_blank");
+    }
   };
 
   return (
